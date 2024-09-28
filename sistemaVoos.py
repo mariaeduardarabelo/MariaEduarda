@@ -11,7 +11,7 @@ while continua == "s":
     destino = input("Digite um destino:")
     destinos.append(destino)
 
-    continua = input("Deseja continuar? (s/n): ")
+    continua = input("Deseja continuar? (s/n)")
 for nome in nomes:
     print("Sistema de Reserva de Voos")
     print(f"Nome: {nome}")
