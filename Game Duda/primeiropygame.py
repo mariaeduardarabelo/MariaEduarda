@@ -6,7 +6,7 @@ tamanho = (900,500)
 
 tela = pygame.display.set_mode(tamanho)
 #Define o título da janela
-pygame.display.set_caption("Hello Games")
+pygame.display.set_caption("Hello Games!")
 #Define um relogio para controlar o FPS
 relogio = pygame.time.Clock()
 
