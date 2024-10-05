@@ -1,5 +1,6 @@
 import pygame
 #inicializar o pygame
+
 pygame.init()
 #cria uma tela com tamanho especificado
 tamanho = (900,500)
