@@ -9,23 +9,23 @@ tela = pygame.display.set_mode(tamanho)
 pygame.display.set_caption("Homelees Walker")
 dt = 0
 
-folhaSpritesIdle = pygame.image.load("assets/Homeless_1/Idle.png").convert_alpha()
+folhaSpritesWalk = pygame.image.load("assets/Homeless_1/Walk.png").convert_alpha()
 folhaSpritesWalk = pygame.image.load("assets/Homeless_1/Walk.png").convert_alpha()
 
 #define os frames
-framesIdle = []
+framesWalk = []
 
 for i in range(6):
-    frame = folhaSpritesIdle.subsurface(i * 128, 0, 128, 128)
+    frame = folhaSpritesWalk.subsurface(i * 128, 0, 128, 128)
     frame = pygame.transform.scale(frame, (256,256))
-    framesIdle.append(frame)
+    framesWalk.append(frame)
 
-#variaveis da animaçao do personagem parado
-indexFrameIdle = 0
-tempoAnimacaoIdle = 0.0
-velocidadeAnimacaoIdle = 10
+#variaveis da animaçao do personagem parado = 0
+indexFrameWalk = 0
+tempoAnimacaoWalk = 0.0
+velocidadeAnimacaoWalk = 10
 
-personagemRect = framesIdle[0].get_rect(midbottom = (100, 480))
+personagemRect = framesWalk[0].get_rect(midbottom = (100, 480))
 gravidade = 1
 
 while True:
@@ -37,11 +37,11 @@ while True:
     tela.fill((255,255,255))
 
     #Atualiza a animação do personagem parado
-    tempoAnimacaoIdle += dt
+    tempoAnimacaoWalk += dt
 
-    if tempoAnimacaoIdle >= 1 / velocidadeAnimacaoIdle:
-        indexFrameIdle = (indexFrameIdle + 1) % len(framesIdle)
-        tempoAnimacaoIdle = 0.0
+    if tempoAnimacaoWalk >= 1 / velocidadeAnimacaoWalk:
+        indexFrameWalk = (indexFrameWalk + 1) % len(framesWalk)
+        tempoAnimacaoWalk = 0.0
 
 
     #Movimenta o personagem no eixo x
@@ -69,9 +69,9 @@ while True:
     #     personagemRect.y +=100 * dt
 
     #Desenha o personagem
-    tela.blit(framesIdle[indexFrameIdle],personagemRect)
+    tela.blit(framesWalk[indexFrameWalk],personagemRect)
 
-    pygame.draw.rect(tela, (0, 0, 0), personagemRect, 2)
+    #pygame.draw.rect(tela, (0, 0, 0), personagemRect, 2)
 
     pygame.display.update()
     dt = relogio.tick(60)/1000
