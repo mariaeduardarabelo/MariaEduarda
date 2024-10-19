@@ -72,8 +72,8 @@ listBgImages = [
     pygame.image.load("assets/Apocalipse/Postapocalypce4/Bright/floor&underfloor.png").convert_alpha()
 ]
 
-listaBgVelocidades = [1, 2, 3, 4, 5, 6, 7] #Velocidade de cada plano de fundo
-listaBgPosicoes = [for _ in range(len(listBgImages))] #Posições de cada imagem do plano de fundo
+listaBgVelocidades = [1, 3, 7, 9, 10, 15, 20] #Velocidade de cada plano de fundo
+listaBgPosicoes = [0 for _ in range(len(listBgImages))] #Posições de cada imagem do plano de fundo
 
 for i in range(len(listBgImages)):
     listBgImages[i] = pygame.transform.scale(listBgImages[i], tamanhoTela)
@@ -102,9 +102,9 @@ while True:
     # Desenha o plano de fundo
     for i in range(len(listBgImages)):
         #Desenha o plano de fundo
-        tela.blit(listBgImages[i], (listaBgPosicoes[i],0))
+        tela.blit(listBgImages[i], (listaBgPosicoes[i], 0))
         #Desenha a imagem do plano de fundo que está na tela
-        tela.blit(listBgImages[i], (listaBgPosicoes[i],+ tamanhoTela[0], 0))
+        tela.blit(listBgImages[i], (listaBgPosicoes[i] + tamanhoTela[0], 0))
 
     # Soma o tempo que se passou desde o último frame
     tempoAnimacaoIdle += dt
