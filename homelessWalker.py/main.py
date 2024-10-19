@@ -2,8 +2,8 @@ import pygame
 
 pygame.init()
 relogio = pygame.time.Clock()
-tamanho = (1200, 500)
-tela = pygame.display.set_mode(tamanho)
+tamanhoTela = (1280, 720)
+tela = pygame.display.set_mode(tamanhoTela)
 pygame.display.set_caption("Homeless Walker")
 dt = 0
 
@@ -60,6 +60,22 @@ gravidade = 1 # Gravidade do jogo, valor que aumenta a cada frame
 direcaoPersonagem = 1 # Direção que o personagem está olhando (1 = Direita, -1 = Esquerda)
 estaAndando = False # Define se o personagem está andando ou não
 
+# Assets para o plano de fundo
+
+listBgImages = [
+    pygame.image.load("assets/Apocalipse/Postapocalypce4/Bright/bg.png").convert_alpha(),
+    pygame.image.load("assets/Apocalipse/Postapocalypce4/Bright/rail&wall.png").convert_alpha(),
+    pygame.image.load("assets/Apocalipse/Postapocalypce4/Bright/train.png").convert_alpha(),
+    pygame.image.load("assets/Apocalipse/Postapocalypce4/Bright/columns&floor.png").convert_alpha(),
+    pygame.image.load("assets/Apocalipse/Postapocalypce4/Bright/infopost&wires.png").convert_alpha(),
+    pygame.image.load("assets/Apocalipse/Postapocalypce4/Bright/wires.png").convert_alpha(),
+    pygame.image.load("assets/Apocalipse/Postapocalypce4/Bright/floor&underfloor.png").convert_alpha()
+]
+
+for i in range(len(listBgImages)):
+    listBgImages[i] = pygame.transform.scale(listBgImages[i], tamanhoTela)
+
+ALTURA_CHAO = 480
 # Loop Principal
 while True:
 
@@ -71,6 +87,10 @@ while True:
             exit() # Fecha o programa
 
     tela.fill((255, 255, 255)) # Cor da tela (RGB)
+
+    # Desenha o plano de fundo
+    for i in range(len(listBgImages)):
+        tela.blit(listBgImages[i], (0,0))
 
     # Soma o tempo que se passou desde o último frame
     tempoAnimacaoIdle += dt
