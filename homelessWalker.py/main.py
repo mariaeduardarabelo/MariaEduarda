@@ -8,16 +8,22 @@ tela = pygame.display.set_mode(tamanhoTela)
 pygame.display.set_caption("Homeless Walker")
 dt = 0
 
+# Carrega a fonte a ser usada no jogo
+fonteTempo = pygame.font.Font("assets/Fonts/Energy Station.ttf", 80)
+
+# Carrega a spritesheet para nosso projeto
 # spritesheet são as imagens sequência de sprites
-# Carrega as imagens
 folhaSpritesIdle = pygame.image.load("assets/Homeless_1/Idle_2.png").convert_alpha()
 folhaSpritesWalk = pygame.image.load("assets/Homeless_1/Walk.png").convert_alpha()
 folhaSpritesJump = pygame.image.load("assets/Homeless_1/Jump.png").convert_alpha()
+folhaSpritesRunn = pygame.image.load("assets/Homeless_1/Run.png").convert_alpha()
+
 
 # Define os frames
 listFramesIdle = []
 listFramesWalk = []
 listFramesJump = []
+listFramesRunn = []
 
 # Cria os frames do personagem na lista de listFramesIdle
 for i in range(11):
@@ -40,12 +46,17 @@ for i in range(9):
     frame = pygame.transform.scale(frame, (256, 256))
     listFramesJump.append(frame)
 
-# animação do personagem parado
+for i in range(8):
+    frame = folhaSpritesRunn.subsurface(i * 128, 0, 128, 128)
+    frame = pygame.transform.scale(frame, (256, 256))
+    listFramesRunn.append(frame)
+
+# Variaveis da animação do personagem parado
 indexFrameIdle = 0 # Controla qual imagem está sendo mostrada na tela
 tempoAnimacaoIdle = 0.0 # Controla quanto tempo se passou desde a última troca de frame
 velocidadeAnimacaoIdle = 5 # Controlar o tempo de animação em relação ao tempo real (1 / velocidadeAnimacaoIdle)
 
-# animação do personagem andando
+# Variaveis da animação do personagem andando
 indexFrameWalk = 0
 tempoAnimacaoWalk = 0.0
 velocidadeAnimacaoWalk = 10
@@ -55,6 +66,12 @@ indexFrameJump = 0
 tempoAnimacaoJump = 0.0
 velocidadeAnimacaoJump = 5
 
+# Variaveis da animação do personagem correndo
+indexFrameRunn = 0
+tempoAnimacaoRunn = 0.0
+velocidadeAnimacaoRunn = 10
+
+# Retangulo do personagem na tela para melhor controle e posicionamento do personagem
 personagemRect = listFramesIdle[0].get_rect(midbottom=(250, 480))
 
 gravidade = 1 # Gravidade do jogo, valor que aumenta a cada frame
@@ -80,7 +97,13 @@ for i in range(len(listBgImages)):
     listBgImages[i] = pygame.transform.scale(listBgImages[i], tamanhoTela)
 
 ALTURA_CHAO = 485
-VELOCIDADE_PERSONAGEM = 10
+velocidadePersonagem = 30
+tempoJogo = 0
+
+AUMENTA_DIFICULDADE = pygame.USEREVENT + 1 # Evento para aumentar a dificuldade do jogo
+
+pygame.time.set_timer(AUMENTA_DIFICULDADE, 10000) # Aumenta a dificuldade a cada 10 segundos
+
 # Loop Principal
 while True:
     # Loop que verifica todos os eventos que acontecem no jogo
@@ -91,23 +114,27 @@ while True:
             pygame.quit() # Fecha o jogo
             exit() # Fecha o programa
 
-    tela.fill((255, 255, 255)) # Cor da tela (RGB)
+        if event.type == AUMENTA_DIFICULDADE:
+            velocidadePersonagem += 4
 
-    #Percorre todas as imagens do plano de fundo pra movimentar
+    tela.fill((255, 255, 255)) # Preenche a tela com a cor branca
+
+    # Percorre todas as imagens do plano de fundo para movimentar
     for i in range(len(listBgImages)):
         if estaAndando:
-            listaBgPosicoes[i] -= listaBgVelocidades[i] * 10 * dt #Move a imagem para a esquerda
+            listaBgPosicoes[i] -= listaBgVelocidades[i] * velocidadePersonagem * dt * direcaoPersonagem # Move a imagem para a esquerda
 
-    # Verifica se a imagem saiu da tela
-    if listaBgPosicoes[i] <= -tamanhoTela[0]:
-        listaBgPosicoes[i] = 0
+        # Verifica se a imagem saiu da tela para a esquerda
+        if listaBgPosicoes[i] <= -tamanhoTela[0]:
+            listaBgPosicoes[i] = 0 # Retorna a imagem para a posição inicial
 
-    if listaBgPosicoes[i] <= -tamanhoTela[0]:
-        listaBgPosicoes[i] = 0
+        # Verifica se a imagem saiu da tela para a direita
+        if listaBgPosicoes[i] >= tamanhoTela[0]:
+            listaBgPosicoes[i] = 0
 
     # Desenha o plano de fundo
     for i in range(len(listBgImages)):
- # Desenha a imagem do plano de fundo que está na tela
+        # Desenha a imagem do plano de fundo que está na tela
         tela.blit(listBgImages[i], (listaBgPosicoes[i], 0))
 
         # Desenha a imagem do plano de fundo que está fora da tela na direita
@@ -115,7 +142,17 @@ while True:
 
         # Desenha a imagem do plano de fundo que está fora da tela na esquerda
         tela.blit(listBgImages[i], (listaBgPosicoes[i] + -tamanhoTela[0], 0))
-    
+
+    # Atualiza o tempo de jogo
+    tempoJogo += dt
+
+    # Cria o texto para o tempo de jogo
+    textoTempo = fonteTempo.render(str(int(tempoJogo)), False, (255, 255, 255))
+
+    # Desenha o tempo de jogo na tela
+    tela.blit(textoTempo, (tamanhoTela[0] / 2, 30))
+
+    # Soma o tempo que se passou desde o último frame
     tempoAnimacaoIdle += dt
 
     # Verifica se o tempo de animação do personagem parado é maior ou igual ao tempo de animação
@@ -142,27 +179,36 @@ while True:
         indexFrameJump = (indexFrameJump + 1) % len(listFramesJump)
         tempoAnimacaoJump = 0.0
 
+    # Atualiza a animação do personagem correndo
+    tempoAnimacaoRunn += dt
+
+    # Verifica se o tempo de animação do personagem correndo é maior ou igual ao tempo de animação
+    if tempoAnimacaoRunn >= 1 / velocidadeAnimacaoRunn:
+        # Atualiza o frame do personagem correndo
+        indexFrameRunn = (indexFrameRunn + 1) % len(listFramesRunn)
+        tempoAnimacaoRunn = 0.0
+
     # Verifica se o personagem está andando
     estaAndando = False
+
     # Pega as teclas que foram pressionadas
     listTeclas = pygame.key.get_pressed()
 
     if listTeclas[pygame.K_LEFT]: # Verifica se a tecla esquerda foi pressionada
-        #personagemRect.x -= 200 * dt # Movimenta o personagem para a esquerda
         direcaoPersonagem = -1 # Define a direção do personagem para a esquerda
         estaAndando = True # Define que o personagem está andando
 
     if listTeclas[pygame.K_RIGHT]:
-        #personagemRect.x += 200 * dt # Movimenta o personagem para a direita
         direcaoPersonagem = 1
         estaAndando = True
 
     if listTeclas[pygame.K_SPACE]: # Verifica se a tecla espaço foi pressionada
-          if personagemRect.centery == ALTURA_CHAO: # Verifica se o personagem está no chão
+        if personagemRect.centery == ALTURA_CHAO: # Verifica se o personagem está no chão
             gravidade = -30 # Define como negativo para o personagem subir
             indexFrameJump = 0 # Reseta o frame do pulo
+
     # Gravidade Aumenta
-    gravidade += 3
+    gravidade += 2
 
     # Atualiza a posição Y do personagem de acordo com a gravidade
     personagemRect.y += gravidade
@@ -176,7 +222,17 @@ while True:
         frame = listFramesJump[indexFrameJump]
     else:
         if estaAndando: # Verifica se o personagem está andando
-            frame = listFramesWalk[indexFrameWalk]
+            if velocidadePersonagem < 40:
+                frame = listFramesWalk[indexFrameWalk]
+            if velocidadePersonagem < 50:
+                frame = listFramesRunn[indexFrameRunn]
+            elif velocidadePersonagem < 70:
+                velocidadeAnimacaoRunn = 30
+                frame = listFramesRunn[indexFrameRunn]
+            else:
+                velocidadeAnimacaoRunn = 40
+                frame = listFramesRunn[indexFrameRunn]
+            
         else: # Caso contrário, o personagem está parado
             frame = listFramesIdle[indexFrameIdle]
 
@@ -186,5 +242,5 @@ while True:
     tela.blit(frame, personagemRect) # Desenha o personagem na tela
 
     pygame.display.update() # Atualiza a tela
-    
+
     dt = relogio.tick(60) / 1000 # Define o tempo de cada frame em segundos
