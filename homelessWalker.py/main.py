@@ -17,7 +17,7 @@ folhaSpritesIdle = pygame.image.load("assets/Homeless_1/Idle_2.png").convert_alp
 folhaSpritesWalk = pygame.image.load("assets/Homeless_1/Walk.png").convert_alpha()
 folhaSpritesJump = pygame.image.load("assets/Homeless_1/Jump.png").convert_alpha()
 folhaSpritesRunn = pygame.image.load("assets/Homeless_1/Run.png").convert_alpha()
-
+# folhaSpritesIdle = pygame.image.load("assets/Obstaculos/Itens/Icon28_22.png").convert_alpha()
 
 # Define os frames
 listFramesIdle = []
