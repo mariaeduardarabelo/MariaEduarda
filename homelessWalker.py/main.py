@@ -1,4 +1,5 @@
 import pygame
+from random import randint
 
 pygame.init()
 relogio = pygame.time.Clock()
@@ -24,6 +25,7 @@ listFramesIdle = []
 listFramesWalk = []
 listFramesJump = []
 listFramesRunn = []
+listaObstaculos = []
 
 # Cria os frames do personagem na lista de listFramesIdle
 for i in range(11):
@@ -80,6 +82,22 @@ estaAndando = False # Define se o personagem está andando ou não
 
 # Assets para o plano de fundo
 
+
+# Importar as imagens
+listaImagensObstaculos = [
+    pygame.image.load(f"assets/Weapons/Armas/Icon28_{i:02d}.png").convert_alpha() for i in range(1 ,40)
+   
+]
+
+# loop que redimensiona as imagens dos obstaculos
+for i in range(len(listaImagensObstaculos)):
+    #Redimesiona a imagem 50x50 pixels
+    listaImagensObstaculos[i] = pygame.transform.scale(listaImagensObstaculos[i], (50,50))
+    # Inverte a imagem no eixo X
+    listaImagensObstaculos[i] = pygame.transform.flip(listaImagensObstaculos[i], True, False)
+    # Rotaciona a iamgem em 35 graus
+    listaImagensObstaculos[i] = pygame.transform.rotate(listaImagensObstaculos[i], 35)
+    
 listBgImages = [
     pygame.image.load("assets/Apocalipse/Postapocalypce4/Bright/bg.png").convert_alpha(),
     pygame.image.load("assets/Apocalipse/Postapocalypce4/Bright/rail&wall.png").convert_alpha(),
@@ -89,6 +107,7 @@ listBgImages = [
     pygame.image.load("assets/Apocalipse/Postapocalypce4/Bright/wires.png").convert_alpha(),
     pygame.image.load("assets/Apocalipse/Postapocalypce4/Bright/floor&underfloor.png").convert_alpha()
 ]
+
 
 listaBgVelocidades = [1, 3, 7, 9, 10, 15, 20] #Velocidade de cada plano de fundo
 listaBgPosicoes = [0 for _ in range(len(listBgImages))] #Posições de cada imagem do plano de fundo
@@ -101,8 +120,11 @@ velocidadePersonagem = 30
 tempoJogo = 0
 
 AUMENTA_DIFICULDADE = pygame.USEREVENT + 1 # Evento para aumentar a dificuldade do jogo
-
 pygame.time.set_timer(AUMENTA_DIFICULDADE, 10000) # Aumenta a dificuldade a cada 10 segundos
+
+tempoSurgimentoObstaculo = 3000
+ADICIONA_OBSTACULO = pygame.USEREVENT + 2
+pygame.time.set_timer(ADICIONA_OBSTACULO, tempoSurgimentoObstaculo) #Adiciona os abstaculos a cada 1 segundo
 
 # Loop Principal
 while True:
@@ -116,6 +138,23 @@ while True:
 
         if event.type == AUMENTA_DIFICULDADE:
             velocidadePersonagem += 4
+
+            if tempoSurgimentoObstaculo > 1100:
+                tempoSurgimentoObstaculo -=300
+                pygame.time.set_timer(ADICIONA_OBSTACULO, randint(800, tempoSurgimentoObstaculo))
+
+        if event.type == ADICIONA_OBSTACULO:
+            obstaculoImage = listaImagensObstaculos[randint(0, len(listaImagensObstaculos) - 1)]
+            posicaoX = randint(1280, 1500)
+            obstaculoRect = obstaculoImage.get_rect(midbottom =(posicaoX, 620))
+
+            obstaculo = {
+                "rect": obstaculoRect,
+                "image": obstaculoImage
+            }
+
+            listaObstaculos.append(obstaculo)
+
 
     tela.fill((255, 255, 255)) # Preenche a tela com a cor branca
 
@@ -178,6 +217,19 @@ while True:
         # Atualiza o frame do personagem pulando
         indexFrameJump = (indexFrameJump + 1) % len(listFramesJump)
         tempoAnimacaoJump = 0.0
+
+
+    # Desenha os obstaculos na tela
+    for obstaculos in listaObstaculos:
+        obstaculo["rect"].x -= 30 * velocidadePersonagem * dt
+
+        #verifica se o obstaculo saiu da tela
+        if obstaculo["rect"].right < 0:
+            listaObstaculos.remove(obstaculo)
+
+        tela.blit(obstaculo["image"], obstaculo["rect"])
+
+        pygame.draw.rect(tela, (255, 0, 255), obstaculo["rect"], 2)
 
     # Atualiza a animação do personagem correndo
     tempoAnimacaoRunn += dt
